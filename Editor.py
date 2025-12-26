@@ -3,6 +3,9 @@
 #import 3rd party libraries
 import pygame
 
+#import custom libraries
+from guiFeatures.DropDown import DropDown
+
 #initalise libraries
 pygame.init()
 
@@ -12,61 +15,14 @@ windowHeight = 600
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
 #GUI component classes
-class DropDown():
-    def __init__(self, command, options, default, x, y, closeOnClick=True):
-        self.command = command
-        self.options = options
-        self.isOpen = False
-        self.currentOption = default
-        self.closeOnClick = closeOnClick
-        #define surfaces and rects
-        self.closed =  pygame.Surface((100, 50))
-        self.closedRect = self.closed.get_rect()
-        self.closedRect.x = x
-        self.closedRect.y = y
-        self.open = pygame.Surface((100, 50 * len(options)))
-        self.openRect = self.open.get_rect()
-        self.openRect.x = x
-        self.openRect.y = self.closedRect.bottom + 10
-        self.openRects = {}
-        for i, option in enumerate(self.options):
-            self.openRects[option] = pygame.Rect((0, 0 + (50*i)), (100, 50))
-        #load font
-        self.font = pygame.font.Font(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
 
-    def update(self):
-        self.closed.fill((138, 89, 54))
-        self.closed.blit(self.font.render(self.currentOption, True, (255, 255, 255)), self.closedRect)
-        window.blit(self.closed, self.closedRect)
-        if self.isOpen:
-            self.open.fill((128, 79, 44))
-            #draw options 
-            for option in self.options:
-                self.open.blit(self.font.render(option, True, (255, 255, 255)), self.openRects[option])
-                pygame.draw.rect(self.open, (0, 0, 0), self.openRects[option], 1)
-            window.blit(self.open, self.openRect)
-    def handleClick(self):
-        if self.closedRect.collidepoint(pygame.mouse.get_pos()):
-            self.isOpen = not self.isOpen
-            return
-        for option in self.openRects:
-            if self.openRects[option].collidepoint(pygame.mouse.get_pos()):
-                print(8)
-                #run command with option
-                self.command(option)
-                #set new current option and close dropdown
-                self.currentOption = option
-                if self.closeOnClick:
-                    self.isOpen = False
-                break
-        
 #main GUI features
 class SideBar():
     def __init__(self):
         self.rect = pygame.Rect(0, 0, 200, 600)
         
-        self.gridSelection = DropDown(lambda size: (editorWindow.setGridSize(size)), ("Small", "Medium", "Large"), "Large", 10, 10)
-
+        self.gridSelection = DropDown(window, ("Small", "Medium", "Large"), "Large", 10, 10)
+        self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
     def update(self):
         pygame.draw.rect(window, (138, 89, 54), self.rect, 5)
         self.gridSelection.update()
