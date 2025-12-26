@@ -16,20 +16,20 @@ class DropDown():
         self.closedRect.x = x
         self.closedRect.y = y
         self.open = pygame.Surface((100, 50 * len(options)))
-        print(self.open.height)
         self.openRect = self.open.get_rect()
         self.openRect.x = x
-        self.openRect.y = self.closedRect.bottom + 10
+        self.openRect.y = self.closedRect.bottom
         self.openRects = {}
         for i, option in enumerate(self.options):
             self.openRects[option] = pygame.Rect((0, (50*i)), (100, 50))
+    def setFont(self, path):
         #load font
-        self.font = pygame.font.Font(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.font = pygame.font.Font(path)
     def setCommand(self, command):
         self.command = command
     def update(self):
         self.closed.fill((138, 89, 54))
-        self.closed.blit(self.font.render(self.currentOption, True, (255, 255, 255)), self.closedRect)
+        self.closed.blit(self.font.render(self.currentOption, True, (255, 255, 255)), (0, 0))
         self.window.blit(self.closed, self.closedRect)
         if self.isOpen:
             self.open.fill((128, 79, 44))
