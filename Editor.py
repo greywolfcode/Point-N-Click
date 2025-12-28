@@ -21,21 +21,27 @@ window = pygame.display.set_mode((windowWidth, windowHeight))
 class SideBar():
     def __init__(self):
         self.rect = pygame.Rect(0, 0, 200, 600)
-        #define grid selection drop down
-        self.gridSelection = DropDown(window, ("Small", "Medium", "Large"), "Medium", 20, 50)
-        self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
-        self.gridSelection.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
-        #defin grid display check box
+        #define grid display check box
         self.displayGrid = CheckBox(window, 20, 15, True, 20, text="Show Grid")
         self.displayGrid.setCommand(lambda doGrid: (editorWindow.setDisplayGrid(doGrid)))
         self.displayGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        #define snap to grid check box
+        self.snapToGrid = CheckBox(window, 20, 40, True, 20, text="Snap to Grid")
+        self.snapToGrid.setCommand(lambda doSnap: (editorWindow.setSnapToGrid(doSnap)))
+        self.snapToGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        #define grid selection drop down
+        self.gridSelection = DropDown(window, ("Small", "Medium", "Large"), "Medium", 20, 75)
+        self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
+        self.gridSelection.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
     def update(self):
         pygame.draw.rect(window, (138, 89, 54), self.rect, 5)
-        self.gridSelection.update()
         self.displayGrid.update()
+        self.snapToGrid.update()
+        self.gridSelection.update()
     def handleClick(self):
-        self.gridSelection.handleClick()
         self.displayGrid.handleClick()
+        self.snapToGrid.handleClick()
+        self.gridSelection.handleClick()
 class EditorWindow():
     def __init__(self):
         self.bg = pygame.image.load(r"images\bg\bg.png")
@@ -44,6 +50,7 @@ class EditorWindow():
         self.rect.y = 0
         self.gridType = "m"
         self.doDisplayGrid = True
+        self.snapToGrid = True
         #define largest grid of rects
         self.smallGrid = {}
         for x in range(200, 800, 5):
@@ -82,6 +89,8 @@ class EditorWindow():
             self.gridType = "l"
     def setDisplayGrid(self, doDisplayGrid):
         self.doDisplayGrid = doDisplayGrid
+    def setSnapToGrid(self, snapToGrid):
+        self.snapToGrid = snapToGrid
 #define objects
 editorWindow = EditorWindow()
 sideBar = SideBar()
