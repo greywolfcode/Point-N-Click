@@ -4,7 +4,7 @@
 import pygame
 
 class DropDown():
-    def __init__(self, window, options, default, x, y, closeOnClick=True):
+    def __init__(self, window, x, y, options, default, closeOnClick=True):
         self.window = window
         self.options = options
         self.isOpen = False
@@ -42,15 +42,16 @@ class DropDown():
         if self.closedRect.collidepoint(pygame.mouse.get_pos()):
             self.isOpen = not self.isOpen
             return
-        #modify mouse pos so it works with relitive position with dropdown
-        mousePos = pygame.mouse.get_pos()
-        realativeMousePos = (mousePos[0] - self.openRect.x, mousePos[1] - self.openRect.y)
-        for option in self.openRects:
-            if self.openRects[option].collidepoint(realativeMousePos):
-                #run command with option
-                self.command(option)
-                #set new current option and close dropdown
-                self.currentOption = option
-                if self.closeOnClick:
-                    self.isOpen = False
-                break
+        if self.isOpen:
+            #modify mouse pos so it works with relitive position with dropdown
+            mousePos = pygame.mouse.get_pos()
+            realativeMousePos = (mousePos[0] - self.openRect.x, mousePos[1] - self.openRect.y)
+            for option in self.openRects:
+                if self.openRects[option].collidepoint(realativeMousePos):
+                    #run command with option
+                    self.command(option)
+                    #set new current option and close dropdown
+                    self.currentOption = option
+                    if self.closeOnClick:
+                        self.isOpen = False
+                    break

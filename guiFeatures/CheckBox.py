@@ -22,10 +22,10 @@ class CheckBox():
         self.command = command
     def setFont(self, path):
         self.font = pygame.font.Font(path)
-        self.renderdText = self.font.render(self.text, True, (255, 255, 255))
+        self.renderedText = self.font.render(self.text, True, (255, 255, 255))
     def update(self):
         self.window.blit(self.surface, self.rect)
-        self.window.blit(self.renderdText, (self.rect.right, self.rect.top - 2))
+        self.window.blit(self.renderedText, (self.rect.right, self.rect.top - 2))
     def handleClick(self):
         if (self.rect.collidepoint(pygame.mouse.get_pos())):
             self.state = not self.state

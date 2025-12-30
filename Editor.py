@@ -6,6 +6,8 @@ import pygame
 #import custom libraries
 from guiFeatures.DropDown import DropDown
 from guiFeatures.CheckBox import CheckBox
+from guiFeatures.RadioButton import RadioButton
+
 
 #initalise libraries
 pygame.init()
@@ -15,33 +17,44 @@ windowWidth = 800
 windowHeight = 600
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
-#GUI component classes
+
+#define global variables
+map = []
 
 #main GUI features
 class SideBar():
     def __init__(self):
         self.rect = pygame.Rect(0, 0, 200, 600)
+        #list to store all gui elements in
+        self.guiElements = []
         #define grid display check box
         self.displayGrid = CheckBox(window, 20, 15, True, 20, text="Show Grid")
         self.displayGrid.setCommand(lambda doGrid: (editorWindow.setDisplayGrid(doGrid)))
         self.displayGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.guiElements.append(self.displayGrid)
         #define snap to grid check box
         self.snapToGrid = CheckBox(window, 20, 40, True, 20, text="Snap to Grid")
         self.snapToGrid.setCommand(lambda doSnap: (editorWindow.setSnapToGrid(doSnap)))
         self.snapToGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.guiElements.append(self.snapToGrid)
+        #define tools radio buttons
+        self.tools = RadioButton(window, 20, 120, 10, 10, "Tools", ("wall", "barrier"), "wall")
+        self.tools.setCommand(lambda tool: editorWindow.setTool(tool))
+        self.tools.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.guiElements.append(self.tools)
         #define grid selection drop down
-        self.gridSelection = DropDown(window, ("Small", "Medium", "Large"), "Medium", 20, 75)
+        self.gridSelection = DropDown(window, 20, 75, ("Small", "Medium", "Large"), "Medium",)
         self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
         self.gridSelection.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.guiElements.append(self.gridSelection)
+        
     def update(self):
         pygame.draw.rect(window, (138, 89, 54), self.rect, 5)
-        self.displayGrid.update()
-        self.snapToGrid.update()
-        self.gridSelection.update()
+        for element in self.guiElements:
+            element.update()
     def handleClick(self):
-        self.displayGrid.handleClick()
-        self.snapToGrid.handleClick()
-        self.gridSelection.handleClick()
+        for element in self.guiElements:
+            element.handleClick()
 class EditorWindow():
     def __init__(self):
         self.bg = pygame.image.load(r"images\bg\bg.png")
@@ -91,6 +104,9 @@ class EditorWindow():
         self.doDisplayGrid = doDisplayGrid
     def setSnapToGrid(self, snapToGrid):
         self.snapToGrid = snapToGrid
+    def setTool(self, tool):
+        #once tools are made, this will be changed
+        pass
 #define objects
 editorWindow = EditorWindow()
 sideBar = SideBar()
