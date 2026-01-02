@@ -26,7 +26,7 @@ order.json stores the order of each mission.
 
 (NAME).mission
 |
-|-layout.json
+|-layout.xml
 |-triggers.json
 |-cutscenes
   |-cutscene1.json
@@ -34,9 +34,9 @@ order.json stores the order of each mission.
   |-cutscenen.json
 |
 
-### layout.json
+### layout.xml
 
-layout.json stores the layout of the map.
+layout.xml stores the layout of the map. Each object on the map will be its own block
 
 ### triggers.json
 

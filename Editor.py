@@ -1,4 +1,5 @@
 #import standard libraries
+import xml.etree.ElementTree
 
 #import 3rd party libraries
 import pygame
@@ -18,9 +19,76 @@ windowHeight = 600
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
 
-#define global variables
-map = []
+#define dictionarys to store map elemnts
+mapElements = {
+            "wall": {},
+            "barrier": {},
+}
 
+#define class to store brushes
+class Brush():
+    def __init__(self, tag, continuous, xOffset):
+        '''        
+        tag: type of element
+        continuous: creates over the range
+        '''
+        self.tag = tag
+        self.continuous = continuous
+        self.xOffset = xOffset
+        self.currentlyDrawing = False
+    def onClick(self):
+        if editorWindow.mouseInWindow():
+            if editorWindow.getSnapToGrid():
+                startPos = editorWindow.getClickedCell()
+            else:
+                startPos = pygame.mouse.get_pos()
+                startPos = pygame.Rect(startPos[0], startPos[1], 0, 0) #rect has no width or height
+            self.startPos = pygame.Rect(startPos.x + self.xOffset, startPos.y, startPos.width, startPos.height)
+            self.currentlyDrawing = True
+    def onUnclick(self):
+        if self.currentlyDrawing:
+            if editorWindow.getSnapToGrid():
+                endPos = editorWindow.getClickedCell().left
+            else:
+                endPos = pygame.mouse.get_pos()
+                endPos = pygame.Rect(endPos[0], endPos[1], 0, 0) #rect has no width or height
+            self.endPos = pygame.Rect(endPos.x + self.xOffset, endPos.y, endPos.width, endPos.height)
+            #compile data
+            data = {
+                "xStart": self.startPos[0],
+                "yStart": self.startPos[1],
+                "xEnd": self.endPos[0],
+                "yEnd": self.endPos[1],
+            }
+            #get name
+            elementName = self.tag + " " + str(len(mapElements))
+            #write basic data to map
+            mapElements[elementName] = data
+            self.currentlyDrawing = False
+    def update(self):
+        if self.currentlyDrawing:
+            if editorWindow.getSnapToGrid():
+                currentPos = editorWindow.getClickedCell()
+            else:
+                currentPos = pygame.mouse.get_pos()
+                currentPos = pygame.Rect(currentPos[0], currentPos[1], 0, 0) #rect has no width or height
+            #get width and height
+            width = abs(currentPos[0] - self.startPos[0] + self.xOffset)
+            height = abs(self.startPos[1] - currentPos[1])
+            #get required coordinents for x
+            if self.startPos.x + self.xOffset < currentPos.x:
+                x = self.startPos.x + self.xOffset - width
+            elif self.startPos.x + self.xOffset >= currentPos.x:
+                x = currentPos.x
+            #get required coordinents for y
+            if self.startPos.y <= currentPos.y:
+                y = self.startPos.y
+            elif self.startPos.y > currentPos.y:
+                y = currentPos.y
+            
+            #draw rect
+            rectValues = (x, y, width, height)
+            pygame.draw.rect(window, (0, 155, 0, 100), rectValues)
 #main GUI features
 class SideBar():
     def __init__(self):
@@ -55,6 +123,8 @@ class SideBar():
     def handleClick(self):
         for element in self.guiElements:
             element.handleClick()
+
+
 class EditorWindow():
     def __init__(self):
         self.bg = pygame.image.load(r"images\bg\bg.png")
@@ -64,6 +134,12 @@ class EditorWindow():
         self.gridType = "m"
         self.doDisplayGrid = True
         self.snapToGrid = True
+        #define brushes
+        self.brushes = {
+            "wall": Brush("wall", True, self.rect.x),
+            "barrier": Brush("wall", True, self.rect.x),
+        }
+        self.currentBrush = self.brushes["wall"]
         #define largest grid of rects
         self.smallGrid = {}
         for x in range(200, 800, 5):
@@ -83,6 +159,11 @@ class EditorWindow():
         window.blit(self.bg, self.rect)
         if (self.doDisplayGrid):
             self.displayGrid()
+        self.currentBrush.update()
+    def onClick(self):
+        self.currentBrush.onClick()
+    def onUnClick(self):
+        self.currentBrush.onUnclick()
     def displayGrid(self):
         if self.gridType == "l":
             for cell in self.largeGrid.values():
@@ -104,9 +185,27 @@ class EditorWindow():
         self.doDisplayGrid = doDisplayGrid
     def setSnapToGrid(self, snapToGrid):
         self.snapToGrid = snapToGrid
+    def getSnapToGrid(self):
+        return self.snapToGrid
+    def mouseInWindow(self):
+        return self.rect.collidepoint(pygame.mouse.get_pos())
     def setTool(self, tool):
-        #once tools are made, this will be changed
-        pass
+        self.currentBrush = self.brushes[tool]
+    def getClickedCell(self):
+        '''Returns the cell that the mouse is in'''
+        mousePos = pygame.mouse.get_pos()
+        #get the current grid
+        if self.gridType == "l":
+            grid = self.largeGrid
+        elif self.gridType == "m":
+            grid = self.mediumGrid
+        elif self.gridType == "s":
+            grid = self.smallGrid
+        #iterate through cells and find which was clicked
+        for cell in grid.values():
+            if cell.collidepoint(mousePos):
+                return cell
+
 #define objects
 editorWindow = EditorWindow()
 sideBar = SideBar()
@@ -125,6 +224,9 @@ while run:
             run = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             sideBar.handleClick()
+            editorWindow.onClick()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            editorWindow.onUnClick()
     
     #update display
     pygame.display.update()
