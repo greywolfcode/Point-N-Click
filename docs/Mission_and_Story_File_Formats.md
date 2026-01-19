@@ -4,6 +4,7 @@ Point n' CLick's  Editor has two wile formats for storing playable files. Storie
 
 ## Story files (.story)
 
+```
 (NAME).story
 |
 |-info.json
@@ -13,6 +14,7 @@ Point n' CLick's  Editor has two wile formats for storing playable files. Storie
 |-mission2.mission
 |-missionn.mission
 |
+```
 
 ### info.json
 
@@ -24,6 +26,7 @@ order.json stores the order of each mission.
 
 ## Mission files (.mission)
 
+```
 (NAME).mission
 |
 |-layout.xml
@@ -33,6 +36,7 @@ order.json stores the order of each mission.
   |-cutscene2.json
   |-cutscenen.json
 |
+```
 
 ### layout.xml
 
