@@ -50,6 +50,7 @@ class Brush():
         if self.currentlyDrawing:
             if editorWindow.getSnapToGrid():
                 endPos = editorWindow.getClickedCell()
+                endPos = pygame.Rect(endPos.right, endPos.bottom, 0, 0)
             else:
                 endPos = pygame.mouse.get_pos()
                 endPos = pygame.Rect(endPos[0] - self.xOffset, endPos[1], 0, 0) #rect has no width or height
@@ -81,6 +82,7 @@ class Brush():
         if self.currentlyDrawing:
             if editorWindow.getSnapToGrid():
                 currentPos = editorWindow.getClickedCell()
+                currentPos = pygame.Rect(currentPos.right, currentPos.bottom, 0, 0)
             else:
                 currentPos = pygame.mouse.get_pos()
                 currentPos = pygame.Rect(currentPos[0] - self.xOffset, currentPos[1], 0, 0) #rect has no width or height
@@ -94,9 +96,9 @@ class Brush():
             elif self.startPos.x >= currentPos.x:
                 x = currentPos.x
             #get required coordinents for y
-            if self.startPos.y < currentPos.y:
+            if self.startPos.y <= currentPos.y:
                 y = self.startPos.y
-            elif self.startPos.y >= currentPos.y:
+            elif self.startPos.y > currentPos.y:
                 y = currentPos.y
             
             #draw rect
