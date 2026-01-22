@@ -9,6 +9,8 @@ from guiFeatures.DropDown import DropDown
 from guiFeatures.CheckBox import CheckBox
 from guiFeatures.RadioButton import RadioButton
 
+import levelHandeling
+
 
 #initalise libraries
 pygame.init()
@@ -74,7 +76,7 @@ class Brush():
                 "height": height,
             }
             #get name
-            elementName = self.tag + " " + str(len(mapElements[self.tag]))
+            elementName = self.tag + str(len(mapElements[self.tag]))
             #write basic data to map
             mapElements[self.tag][elementName] = data
             self.currentlyDrawing = False
@@ -278,5 +280,10 @@ while run:
     
     #update display
     pygame.display.update()
+
+
+#TODO add proper saving buttons. This is just temporary measure
+levelHandeling.saveLevelLayout(mapElements, "a")
+
 #close pygame stuff
 pygame.quit()
