@@ -92,7 +92,8 @@ while run:
         frameCounter += 1
     if frame > 15:
         frame = 0
-    mouse.checkCollision()
+    if (grabbed): #only need to check collision if mouse is held
+        mouse.checkCollision()
     #update window
     pygame.display.update()
 

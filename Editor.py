@@ -48,7 +48,9 @@ class Brush():
                 startPos = pygame.Rect(startPos[0] - self.xOffset, startPos[1], 0, 0) #rect has no width or height
             self.startPos = pygame.Rect(startPos.x, startPos.y, startPos.width, startPos.height)
             self.currentlyDrawing = True
+        pygame.event.set_grab(True) 
     def onUnclick(self):
+        pygame.event.set_grab(False) 
         if self.currentlyDrawing:
             if editorWindow.getSnapToGrid():
                 endPos = editorWindow.getClickedCell()
@@ -82,6 +84,8 @@ class Brush():
             self.currentlyDrawing = False
     def update(self):
         if self.currentlyDrawing:
+            if (not editorWindow.mouseInWindow()):
+                editorWindow.setMouseToWindow()
             if editorWindow.getSnapToGrid():
                 currentPos = editorWindow.getClickedCell()
                 currentPos = pygame.Rect(currentPos.right, currentPos.bottom, 0, 0)
@@ -91,7 +95,6 @@ class Brush():
             #get width and height
             width = abs(currentPos[0] - self.startPos[0])
             height = abs(self.startPos[1] - currentPos[1])
-            print(currentPos)
             #get required coordinents for x
             if self.startPos.x < currentPos.x:
                 x = self.startPos.x
@@ -238,6 +241,9 @@ class EditorWindow():
         return self.snapToGrid
     def mouseInWindow(self):
         return self.rect.collidepoint(pygame.mouse.get_pos())
+    def setMouseToWindow(self):
+        '''This only moves the cursor laterally to the surface; it can be clamped inside the windwo for other directions'''
+        pygame.mouse.set_pos(self.rect.x, pygame.mouse.get_pos()[1])
     def setTool(self, tool):
         self.currentBrush = self.brushes[tool]
     def getClickedCell(self):
