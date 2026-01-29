@@ -54,7 +54,15 @@ class Brush():
         if self.currentlyDrawing:
             if editorWindow.getSnapToGrid():
                 endPos = editorWindow.getClickedCell()
-                endPos = pygame.Rect(endPos.right, endPos.bottom, 0, 0)
+                if self.startPos.x <= endPos.x:
+                    endX = endPos.right
+                elif self.startPos.x > endPos.x:
+                    endX = endPos.x
+                if self.startPos.y <= endPos.y:
+                    endY = endPos.bottom
+                elif self.startPos.y > endPos.y:
+                    endY = endPos.y
+                endPos = pygame.Rect(endX, endY, 0, 0)
             else:
                 endPos = pygame.mouse.get_pos()
                 endPos = pygame.Rect(endPos[0] - self.xOffset, endPos[1], 0, 0) #rect has no width or height
@@ -68,9 +76,16 @@ class Brush():
                 y = self.startPos.y
             elif self.startPos.y > endPos.y:
                 y = endPos.y
-            #get width and height
-            width = abs(endPos[0] - self.startPos[0])
-            height = abs(self.startPos[1] - endPos[1])
+            #get width and height; want to fill cell that was first clicked on
+            #this won't matter if not snapping to grid because with and heigh are zero for the rect then
+            if endPos.x < self.startPos.x:
+                width = abs(endPos.x - self.startPos.right)
+            else:
+                width = abs(endPos.x - self.startPos.x)
+            if endPos.y < self.startPos.y:
+                height = abs(endPos.y - self.startPos.bottom)
+            else:
+                height = abs(endPos.y - self.startPos.y)
             data = {
                 "x": x,
                 "y": y,
@@ -88,13 +103,29 @@ class Brush():
                 editorWindow.setMouseToWindow()
             if editorWindow.getSnapToGrid():
                 currentPos = editorWindow.getClickedCell()
-                currentPos = pygame.Rect(currentPos.right, currentPos.bottom, 0, 0)
+                #get right x and y so box is drawn to the edges
+                if self.startPos.x <= currentPos.x:
+                    currentX = currentPos.right
+                elif self.startPos.x > currentPos.x:
+                    currentX = currentPos.x
+                if self.startPos.y <= currentPos.y:
+                    currentY = currentPos.bottom
+                elif self.startPos.y > currentPos.y:
+                    currentY = currentPos.y
+                currentPos = pygame.Rect(currentX, currentY, 0, 0)
             else:
                 currentPos = pygame.mouse.get_pos()
                 currentPos = pygame.Rect(currentPos[0] - self.xOffset, currentPos[1], 0, 0) #rect has no width or height
-            #get width and height
-            width = abs(currentPos[0] - self.startPos[0])
-            height = abs(self.startPos[1] - currentPos[1])
+            #get width and height; want to fill cell that was first clicked on
+            #this won't matter if not snapping to grid because with and heigh are zero for the rect then
+            if currentPos.x < self.startPos.x:
+                width = abs(currentPos.x - self.startPos.right)
+            else:
+                width = abs(currentPos.x - self.startPos.x)
+            if currentPos.y < self.startPos.y:
+                height = abs(currentPos.y - self.startPos.bottom)
+            else:
+                height = abs(currentPos.y - self.startPos.y)
             #get required coordinents for x
             if self.startPos.x < currentPos.x:
                 x = self.startPos.x
