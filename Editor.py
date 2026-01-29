@@ -16,7 +16,7 @@ import levelHandeling
 pygame.init()
 
 #define window stuff
-windowWidth = 800
+windowWidth = 1000
 windowHeight = 600
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
@@ -202,17 +202,17 @@ class EditorWindow():
         self.smallGrid = {}
         for x in range(0, 600, 5):
             for y in range(0, 600, 5):
-                self.smallGrid[(x, y)] = pygame.Rect((x, y), (5, 5))
+                self.smallGrid[(x, y)] = pygame.Rect((x, y), (5+1, 5+1)) #all are one pixel more because the right and bottom are not included in the rect, need it for collison
         #define medium, grid of rects
         self.mediumGrid = {}
         for x in range(0, 600, 10):
             for y in range(0, 600, 10):
-                self.mediumGrid[(x, y)] = pygame.Rect((x, y), (10, 10))
+                self.mediumGrid[(x, y)] = pygame.Rect((x, y), (10+1, 10+1))
         #define large, grid of rects
         self.largeGrid = {}
         for x in range(0, 600, 20):
             for y in range(0, 600, 20):
-                self.largeGrid[(x, y)] = pygame.Rect((x, y), (20, 20))
+                self.largeGrid[(x, y)] = pygame.Rect((x, y), (20+1, 20+1))
         #defien frame stuff
         self.frame = 0
         self.frameCounter = 0
@@ -241,6 +241,7 @@ class EditorWindow():
                     self.surface.blit(self.bgImages[elementType], rect, coords)
         if (self.doDisplayGrid):
             self.displayGrid()
+            pygame.draw.line(self.surface, (255, 255, 255), (599, 0), (599, 599))
         self.currentBrush.update()
         window.blit(self.surface, self.rect)
     def onClick(self):
@@ -274,7 +275,11 @@ class EditorWindow():
         return self.rect.collidepoint(pygame.mouse.get_pos())
     def setMouseToWindow(self):
         '''This only moves the cursor laterally to the surface; it can be clamped inside the windwo for other directions'''
-        pygame.mouse.set_pos(self.rect.x, pygame.mouse.get_pos()[1])
+        mouse_pos = pygame.mouse.get_pos()
+        if mouse_pos[0] < self.rect.x:
+            pygame.mouse.set_pos(self.rect.x, mouse_pos[1])
+        elif mouse_pos[0] >= self.rect.right:
+            pygame.mouse.set_pos(self.rect.right, mouse_pos[1]) #was ahving problems with cursor being able to leave; the minus 5 fixed it
     def setTool(self, tool):
         self.currentBrush = self.brushes[tool]
     def getClickedCell(self):
