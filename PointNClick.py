@@ -5,7 +5,7 @@ import os
 import pygame
 
 #import custom libraries
-import levelHandeling
+import libraries.levelHandeling as levelHandeling
 
 #initalise libraries
 pygame.init()
@@ -16,9 +16,9 @@ windowHeight = 600
 window = pygame.display.set_mode((windowWidth, windowHeight))
 
 #load images
-bg = pygame.image.load(os.path.join("images", "bg", "bg.png"))
-wallTexture = pygame.image.load(os.path.join("images", "bg", "wall_texture.png"))
-barrierTexture = pygame.image.load(os.path.join("images", "bg", "border_texture.png"))
+bg = pygame.image.load(os.path.join("assets", "images", "bg", "bg.png"))
+wallTexture = pygame.image.load(os.path.join("assets", "images", "bg", "wall_texture.png"))
+barrierTexture = pygame.image.load(os.path.join("assets", "images", "bg", "border_texture.png"))
 barriers = {}
 walls = {}
 

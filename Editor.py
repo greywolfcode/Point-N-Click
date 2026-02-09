@@ -1,15 +1,15 @@
 #import standard libraries
-import xml.etree.ElementTree
+import os
 
 #import 3rd party libraries
 import pygame
 
 #import custom libraries
-from guiFeatures.DropDown import DropDown
-from guiFeatures.CheckBox import CheckBox
-from guiFeatures.RadioButton import RadioButton
+from libraries.guiFeatures.DropDown import DropDown
+from libraries.guiFeatures.CheckBox import CheckBox
+from libraries.guiFeatures.RadioButton import RadioButton
 
-import levelHandeling
+import libraries.levelHandeling as levelHandeling
 
 
 #initalise libraries
@@ -149,22 +149,22 @@ class SideBar():
         #define grid display check box
         self.displayGrid = CheckBox(window, 20, 15, True, 20, text="Show Grid")
         self.displayGrid.setCommand(lambda doGrid: (editorWindow.setDisplayGrid(doGrid)))
-        self.displayGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.displayGrid.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
         self.guiElements.append(self.displayGrid)
         #define snap to grid check box
         self.snapToGrid = CheckBox(window, 20, 40, True, 20, text="Snap to Grid")
         self.snapToGrid.setCommand(lambda doSnap: (editorWindow.setSnapToGrid(doSnap)))
-        self.snapToGrid.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.snapToGrid.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
         self.guiElements.append(self.snapToGrid)
         #define tools radio buttons
         self.tools = RadioButton(window, 20, 120, 10, 10, "Tools", ("wall", "barrier"), "wall")
         self.tools.setCommand(lambda tool: editorWindow.setTool(tool))
-        self.tools.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.tools.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
         self.guiElements.append(self.tools)
         #define grid selection drop down
         self.gridSelection = DropDown(window, 20, 75, ("Small", "Medium", "Large"), "Medium",)
         self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
-        self.gridSelection.setFont(r"fonts\ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf")
+        self.gridSelection.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
         self.guiElements.append(self.gridSelection)
         
     def update(self):
@@ -178,8 +178,8 @@ class SideBar():
 
 class EditorWindow():
     def __init__(self):
-        self.bg = pygame.image.load(r"images\bg\bg.png")
-        self.surface = pygame.image.load(r"images\bg\bg.png")
+        self.bg = pygame.image.load(os.path.join("assets", "images", "bg", "bg.png"))
+        self.surface = pygame.image.load(os.path.join("assets", "images", "bg", "bg.png"))
         self.rect = self.bg.get_rect()
         self.rect.x = 200
         self.rect.y = 0
@@ -195,8 +195,8 @@ class EditorWindow():
         self.currentBrush = self.brushes["wall"]
         #get bg images
         self.bgImages = {
-            "wall": pygame.image.load(r"images\bg\wall_texture.png"),
-            "barrier": pygame.image.load(r"images\bg\border_texture.png"),
+            "wall": pygame.image.load(os.path.join("assets", "images", "bg", "wall_texture.png")),
+            "barrier": pygame.image.load(os.path.join("assets", "images", "bg", "border_texture.png")),
         }
         #define largest grid of rects
         self.smallGrid = {}
