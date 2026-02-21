@@ -9,6 +9,8 @@ from libraries.guiFeatures.DropDown import DropDown
 from libraries.guiFeatures.CheckBox import CheckBox
 from libraries.guiFeatures.RadioButton import RadioButton
 from libraries.guiFeatures.ScrollBar import ScrollBar
+from libraries.guiFeatures.TextBox import TextBox
+
 
 
 import libraries.levelHandeling as levelHandeling

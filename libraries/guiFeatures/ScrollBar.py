@@ -4,20 +4,20 @@
 import pygame
 
 class ScrollBar():
-    def __init__(self, window, side, scrollSurface, scrollDirection, size):
+    def __init__(self, window, side, scrollRect, scrollDirection, size):
         '''size is the width or height depending on location of scrollbar
             scrollDirection is horz or vert
         '''
         self.window = window
         self.side = side
-        self.scrollSurface = scrollSurface
+        self.scrollRect = scrollRect
         self.scrollDirection = scrollDirection
         #figure out rect size based on surface to move and surface to render on
         if (self.scrollDirection == "horz"):
-            self.width = window.width / scrollSurface.width
+            self.width = window.width / scrollRect.width
             self.height = size
         elif (self.scrollDirection == "vert"):
-            self.height = window.height / scrollSurface.height
+            self.height = window.height / scrollRect.height
             self.width = size
         if (self.side == "left"):
             self.x = self.window.x
