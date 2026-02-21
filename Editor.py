@@ -25,11 +25,13 @@ windowHeight = 600
 
 window = pygame.display.set_mode((windowWidth, windowHeight))
 
-#define dictionarys to store map elemnts
+#define dictionary to store map elemnts
 mapElements = {
             "wall": {},
             "barrier": {},
 }
+#define dictionary to store key requiring elements
+textElements = {}
 
 #define class to store brushes
 class Brush():
@@ -176,8 +178,9 @@ class SideBar():
         for element in self.guiElements:
             element.update()
     def handleClick(self):
-        for element in self.guiElements:
-            element.handleClick()
+        if pygame.mouse.get_focused():
+            for element in self.guiElements:
+                element.handleClick()
 
 
 class EditorWindow():
@@ -302,9 +305,31 @@ class EditorWindow():
             if cell.collidepoint(adjustedPos):
                 return cell
 
+class TriggerWindow():
+    def __init__(self):
+        self.window = pygame.Window("Trigger Editor", (600, 600), hidden=True)
+        self.surface = self.window.get_surface()
+        self.showing = False
+        self.textBox = TextBox(self.surface, 0, 0, showLineNumbers=True)
+        self.textBox.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
+    def update(self):
+        if self.showing:
+            self.surface.fill((158, 109, 74))
+            self.textBox.update()
+            self.window.flip()
+    def changeShowState(self):
+        self.showing = not self.showing
+        if self.showing:
+            self.window.show()
+            #register text box for text updates
+            textElements["triggerBox"] = self.textBox
+        else:
+            self.window.hide()
+            del textElements["triggerBox"]
 #define objects
 editorWindow = EditorWindow()
 sideBar = SideBar()
+triggerWindow = TriggerWindow()
 
 #main loop
 run = True
@@ -318,15 +343,27 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        elif event.type == pygame.WINDOWCLOSE:
+            event.window.hide()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             sideBar.handleClick()
             editorWindow.onClick()
         elif event.type == pygame.MOUSEBUTTONUP:
             editorWindow.onUnClick()
+        elif event.type == pygame.KEYDOWN:
+            #TODO: make this a button on sidebar
+            if event.key == pygame.K_LALT:
+                triggerWindow.changeShowState()
+            elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_RETURN:
+                for element in textElements.values():
+                    element.handleKey(event)
+        elif event.type == pygame.TEXTINPUT:
+            for element in textElements.values():
+                    element.handleTextInput(event)
     
     #update display
+    triggerWindow.update()
     pygame.display.update()
-
 
 #TODO add proper saving buttons. This is just temporary measure
 levelHandeling.saveLevelLayout(mapElements, "a")
