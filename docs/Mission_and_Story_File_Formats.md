@@ -12,7 +12,7 @@ Point n' Click's  Editor has two file formats for storing playable files. Storie
 |
 |-mission1.mission
 |-mission2.mission
-|-missionn.mission
+|-missionN.mission
 |
 ```
 
