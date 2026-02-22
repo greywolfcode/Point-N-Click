@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from xml.sax import parse
+from xml.sax import parseString
 from xml.sax import ContentHandler
 
 
@@ -32,7 +32,7 @@ class LayoutParser(ContentHandler):
         return self.elements
 
 
-def saveLevelLayout(levelStructure, fileName):
+def exportLevelLayout(levelStructure):
     #create xml element
     root = ET.Element("levelData")
     #loop through all types of elements
@@ -50,17 +50,13 @@ def saveLevelLayout(levelStructure, fileName):
                 dataElement = ET.SubElement(elementElement, attribute)
                 dataElement.set("type", type(levelStructure[elementType][element][attribute]).__name__)
                 dataElement.text = str(levelStructure[elementType][element][attribute])
-
     data = ET.tostring(root)
+    return data
 
-    #save file
-    with open("layout.xml", "wb") as file:
-        file.write(data)
-
-def loadLevelLayout(filePath):
+def loadLevelLayout(xmlData):
     #create parsing object
     parser = LayoutParser()
     #parse file
-    parse(filePath, parser)
+    parseString(xmlData, parser)
     #return elements as dictionary
     return parser.getElements()

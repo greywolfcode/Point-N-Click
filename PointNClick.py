@@ -5,7 +5,7 @@ import os
 import pygame
 
 #import custom libraries
-import libraries.levelHandeling as levelHandeling
+import libraries.levelHandling.levelPackager as levelPackager
 
 #initalise libraries
 pygame.init()
@@ -47,7 +47,8 @@ class MouseControl():
 #TEMPORARY
 #load file
 def loadLevel(path):
-    layout = levelHandeling.loadLevelLayout(path)
+    levelData = levelPackager.loadLevel(path)
+    layout = levelData.getLayout()
     for wall in layout["wall"]:
         walls[wall] = pygame.Rect(layout["wall"][wall]["x"], layout["wall"][wall]["y"], layout["wall"][wall]["width"], layout["wall"][wall]["height"])
     for barrier in layout["barrier"]:
@@ -57,7 +58,7 @@ def loadLevel(path):
         "barriers": barriers,
     }
     return elements
-layout = loadLevel("layout.xml")
+layout = loadLevel("a.mission")
 
 
 def drawElements():

@@ -1,6 +1,6 @@
 # Mission and Story file formats
 
-Point n' CLick's  Editor has two wile formats for storing playable files. Stories are full "campaigns", which have multiple "missions" as a part, although .mission files can be played on their own. For example, the main single player story will be stored in a .story file. This document will detial how the .story and .mission file formats are made. Both these files will be secretly .zip files.
+Point n' Click's  Editor has two file formats for storing playable files. Stories are full "campaigns", which have multiple "missions" as a part, although .mission files can be played on their own. For example, the main single player story will be stored in a .story file. This document will detial how the .story and .mission file formats are made. Both these files will be secretly .zip files.
 
 ## Story files (.story)
 
@@ -30,11 +30,14 @@ order.json stores the order of each mission.
 (NAME).mission
 |
 |-layout.xml
-|-triggers.json
+|-triggers
+  |-trigger1.pncbas
+  |-trigger2.pncbas
+  |-triggerN.pncbas
 |-cutscenes
   |-cutscene1.json
   |-cutscene2.json
-  |-cutscenen.json
+  |-cutssceneN.json
 |
 ```
 
@@ -42,9 +45,9 @@ order.json stores the order of each mission.
 
 layout.xml stores the layout of the map. Each object on the map will be its own block
 
-### triggers.json
+### triggers
 
-triggers.json stores all the code for the triggers.
+The triggers folder stores all the trigger files for the mission. Triggers are written in Point n' Click Basic, and saved with the .pncbas file extension
 
 ### cutscenes
 

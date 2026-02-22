@@ -13,7 +13,7 @@ from libraries.guiFeatures.TextBox import TextBox
 
 
 
-import libraries.levelHandeling as levelHandeling
+import libraries.levelHandling.levelPackager as levelPackager
 
 
 #initalise libraries
@@ -344,7 +344,10 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         elif event.type == pygame.WINDOWCLOSE:
-            event.window.hide()
+            if event.window == None:
+                run = False
+            else:
+                event.window.hide()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             sideBar.handleClick()
             editorWindow.onClick()
@@ -362,11 +365,13 @@ while run:
                     element.handleTextInput(event)
     
     #update display
-    triggerWindow.update()
-    pygame.display.update()
+    if (run): #This prevents problems when closing window
+        triggerWindow.update()
+        pygame.display.update()
 
 #TODO add proper saving buttons. This is just temporary measure
-levelHandeling.saveLevelLayout(mapElements, "a")
+currrentLevel = levelPackager.Level(mapElements, {"asdf": "".join(triggerWindow.textBox.text)}, {}) #also a temporary measure for the moment
+levelPackager.packageLevel(currrentLevel, "a")
 
 #close pygame stuff
 pygame.quit()
