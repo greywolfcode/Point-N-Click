@@ -3,16 +3,9 @@ import os
 
 #import 3rd party libraries
 import pygame
+import pygame_gui
 
 #import custom libraries
-from libraries.guiFeatures.DropDown import DropDown
-from libraries.guiFeatures.CheckBox import CheckBox
-from libraries.guiFeatures.RadioButton import RadioButton
-from libraries.guiFeatures.ScrollBar import ScrollBar
-from libraries.guiFeatures.TextBox import TextBox
-
-
-
 import libraries.levelHandling.levelPackager as levelPackager
 
 
@@ -22,8 +15,10 @@ pygame.init()
 #define window stuff
 windowWidth = 1000
 windowHeight = 600
-
 window = pygame.display.set_mode((windowWidth, windowHeight))
+
+#define UI manager
+manager = pygame_gui.UIManager((windowWidth, windowHeight))
 
 #define dictionary to store map elemnts
 mapElements = {
@@ -150,38 +145,26 @@ class Brush():
 class SideBar():
     def __init__(self):
         self.rect = pygame.Rect(0, 0, 200, 600)
-        #list to store all gui elements in
-        self.guiElements = []
-        #define grid display check box
-        self.displayGrid = CheckBox(window, 20, 15, True, 20, text="Show Grid")
-        self.displayGrid.setCommand(lambda doGrid: (editorWindow.setDisplayGrid(doGrid)))
-        self.displayGrid.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
-        self.guiElements.append(self.displayGrid)
-        #define snap to grid check box
-        self.snapToGrid = CheckBox(window, 20, 40, True, 20, text="Snap to Grid")
-        self.snapToGrid.setCommand(lambda doSnap: (editorWindow.setSnapToGrid(doSnap)))
-        self.snapToGrid.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
-        self.guiElements.append(self.snapToGrid)
-        #define tools radio buttons
-        self.tools = RadioButton(window, 20, 120, 10, 10, "Tools", ("wall", "barrier"), "wall")
-        self.tools.setCommand(lambda tool: editorWindow.setTool(tool))
-        self.tools.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
-        self.guiElements.append(self.tools)
-        #define grid selection drop down
-        self.gridSelection = DropDown(window, 20, 75, ("Small", "Medium", "Large"), "Medium",)
-        self.gridSelection.setCommand(lambda size: (editorWindow.setGridSize(size)))
-        self.gridSelection.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
-        self.guiElements.append(self.gridSelection)
+        #add UI elements to SideBar
+        self.showGridRect = pygame.Rect(0, 0, 100, 100)
+        self.showGridButton = pygame_gui.elements.UICheckBox(self.showGridRect, "Show Grid", manager=manager, initial_state=True)
+        
+        self.snapToGridButtonRect = pygame.Rect(0, 120, 100, 100)
+        self.snapToGridButton = pygame_gui.elements.UICheckBox(self.snapToGridButtonRect, "Snap To Grid", manager=manager, initial_state=True)
+
+        self.dropDownRect = pygame.Rect(0, 220, 200, 100)
+        self.dropDown = pygame_gui.elements.UIDropDownMenu(["Small", "Medium", "Large"], "Medium", self.dropDownRect, manager=manager)
+
+        self.wallBrushButtonRect = pygame.Rect(0, 320, 200, 100)
+        self.wallBrushButton = pygame_gui.elements.UIButton(self.wallBrushButtonRect, "Wall", manager=manager)
+
+        self.barrierBrushButtonRect = pygame.Rect(0, 420, 200, 100)
+        self.barrierBrushButton = pygame_gui.elements.UIButton(self.barrierBrushButtonRect, "Barrier", manager=manager)
         
     def update(self):
         pygame.draw.rect(window, (138, 89, 54), self.rect, 5)
-        for element in self.guiElements:
-            element.update()
     def handleClick(self):
-        if pygame.mouse.get_focused():
-            for element in self.guiElements:
-                element.handleClick()
-
+        pass
 
 class EditorWindow():
     def __init__(self):
@@ -310,30 +293,29 @@ class TriggerWindow():
         self.window = pygame.Window("Trigger Editor", (600, 600), hidden=True)
         self.surface = self.window.get_surface()
         self.showing = False
-        self.textBox = TextBox(self.surface, 0, 0, showLineNumbers=True)
-        self.textBox.setFont(os.path.join("assets", "fonts", "ScienceGothic-VariableFont_CTRS,slnt,wdth,wght.ttf"))
     def update(self):
         if self.showing:
             self.surface.fill((158, 109, 74))
-            self.textBox.update()
             self.window.flip()
     def changeShowState(self):
         self.showing = not self.showing
         if self.showing:
             self.window.show()
             #register text box for text updates
-            textElements["triggerBox"] = self.textBox
         else:
             self.window.hide()
-            del textElements["triggerBox"]
 #define objects
 editorWindow = EditorWindow()
 sideBar = SideBar()
 triggerWindow = TriggerWindow()
 
+clock = pygame.time.Clock()
+
 #main loop
 run = True
 while run:
+    #get delta time
+    dt = clock.tick(60)/1000 #limit to 60 fps
     #fill background
     window.fill((158, 109, 74))
     #update objects
@@ -344,10 +326,10 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         elif event.type == pygame.WINDOWCLOSE:
-            if event.window == None:
+            if event.window == None: #occures when closing main window
                 run = False
             else:
-                event.window.hide()
+                event.window.hide() #hide floating windows
         elif event.type == pygame.MOUSEBUTTONDOWN:
             sideBar.handleClick()
             editorWindow.onClick()
@@ -357,20 +339,38 @@ while run:
             #TODO: make this a button on sidebar
             if event.key == pygame.K_LALT:
                 triggerWindow.changeShowState()
-            elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_RETURN:
-                for element in textElements.values():
-                    element.handleKey(event)
-        elif event.type == pygame.TEXTINPUT:
-            for element in textElements.values():
-                    element.handleTextInput(event)
+        #pygame_gui events
+        elif event.type == pygame_gui.UI_BUTTON_PRESSED:
+            if event.ui_element == sideBar.wallBrushButton:
+                editorWindow.setTool("wall")
+            elif event.ui_element == sideBar.barrierBrushButton:
+                editorWindow.setTool("barrier")
+        elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
+            if event.ui_element == sideBar.dropDown:
+                editorWindow.setGridSize(event.text)
+        elif event.type == pygame_gui.UI_CHECK_BOX_CHECKED:
+            if event.ui_element == sideBar.showGridButton:
+                editorWindow.setDisplayGrid(True)
+            elif event.ui_element == sideBar.snapToGridButton:
+                editorWindow.setSnapToGrid(True)
+        elif event.type == pygame_gui.UI_CHECK_BOX_UNCHECKED:
+            if event.ui_element == sideBar.showGridButton:
+                editorWindow.setDisplayGrid(False)
+            elif event.ui_element == sideBar.snapToGridButton:
+                editorWindow.setSnapToGrid(False)
+
+
+        manager.process_events(event)
     
     #update display
     if (run): #This prevents problems when closing window
+        manager.update(dt)
+        manager.draw_ui(window)
         triggerWindow.update()
         pygame.display.update()
 
 #TODO add proper saving buttons. This is just temporary measure
-currrentLevel = levelPackager.Level(mapElements, {"asdf": "".join(triggerWindow.textBox.text)}, {}) #also a temporary measure for the moment
+currrentLevel = levelPackager.Level(mapElements, {"asdf": ""}, {}) #also a temporary measure for the moment
 levelPackager.packageLevel(currrentLevel, "a")
 
 #close pygame stuff
