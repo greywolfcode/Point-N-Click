@@ -4,6 +4,7 @@ import os
 #import 3rd party libraries
 import pygame
 import pygame_gui
+from pygame_gui.core import ObjectID
 
 #import custom libraries
 import libraries.levelHandling.levelPackager as levelPackager
@@ -11,6 +12,7 @@ import libraries.levelHandling.levelPackager as levelPackager
 
 #initalise libraries
 pygame.init()
+pygame.font.init()
 
 #define window stuff
 windowWidth = 1000
@@ -18,12 +20,13 @@ windowHeight = 600
 window = pygame.display.set_mode((windowWidth, windowHeight))
 
 #define UI manager
-manager = pygame_gui.UIManager((windowWidth, windowHeight))
+manager = pygame_gui.UIManager((windowWidth, windowHeight), os.path.join("themes", "editorThemes.json"))
 
 #define dictionary to store map elemnts
 mapElements = {
             "wall": {},
             "barrier": {},
+            "portal": {},
 }
 #define dictionary to store key requiring elements
 textElements = {}
@@ -155,11 +158,11 @@ class SideBar():
         self.dropDownRect = pygame.Rect(0, 220, 200, 100)
         self.dropDown = pygame_gui.elements.UIDropDownMenu(["Small", "Medium", "Large"], "Medium", self.dropDownRect, manager=manager)
 
-        self.wallBrushButtonRect = pygame.Rect(0, 320, 200, 100)
-        self.wallBrushButton = pygame_gui.elements.UIButton(self.wallBrushButtonRect, "Wall", manager=manager)
+        self.toolLabelRect = pygame.Rect(20, 320, 100, 50)
+        self.toolLabel = pygame_gui.elements.UILabel(self.toolLabelRect, "Tools:", manager=manager)
 
-        self.barrierBrushButtonRect = pygame.Rect(0, 420, 200, 100)
-        self.barrierBrushButton = pygame_gui.elements.UIButton(self.barrierBrushButtonRect, "Barrier", manager=manager)
+        self.toolDropDownRect = pygame.Rect(0, 420, 100, 100)
+        self.toolDropDown = pygame_gui.elements.UIDropDownMenu(["Wall", "Barrier", "Portal"], "Wall", self.toolDropDownRect, manager=manager)
         
     def update(self):
         pygame.draw.rect(window, (138, 89, 54), self.rect, 5)
@@ -181,12 +184,17 @@ class EditorWindow():
         self.brushes = {
             "wall": Brush("wall", True, self.rect.x, self.surface),
             "barrier": Brush("barrier", True, self.rect.x, self.surface),
+            "portal": Brush("portal", False, self.rect.x, self.surface)
         }
         self.currentBrush = self.brushes["wall"]
         #get bg images
         self.bgImages = {
             "wall": pygame.image.load(os.path.join("assets", "images", "bg", "wall_texture.png")),
             "barrier": pygame.image.load(os.path.join("assets", "images", "bg", "border_texture.png")),
+        }
+        #get element images
+        self.elementImages = {
+            "portal": pygame.image.load(os.path.join("assets", "images", "interactables", "exit.png"))
         }
         #define largest grid of rects
         self.smallGrid = {}
@@ -229,6 +237,8 @@ class EditorWindow():
                 elif elementType == "barrier":
                     coords[1] += 600 * self.frame
                     self.surface.blit(self.bgImages[elementType], rect, coords)
+                elif elementType == "portal":
+                    self.surface.blit(self.elementImages[elementType], rect, coords)
         if (self.doDisplayGrid):
             self.displayGrid()
             pygame.draw.line(self.surface, (255, 255, 255), (599, 0), (599, 599))
@@ -271,7 +281,7 @@ class EditorWindow():
         elif mouse_pos[0] >= self.rect.right:
             pygame.mouse.set_pos(self.rect.right, mouse_pos[1]) #was ahving problems with cursor being able to leave; the minus 5 fixed it
     def setTool(self, tool):
-        self.currentBrush = self.brushes[tool]
+        self.currentBrush = self.brushes[str.lower(tool)]
     def getClickedCell(self):
         '''Returns the cell that the mouse is in'''
         mousePos = pygame.mouse.get_pos()
@@ -341,13 +351,12 @@ while run:
                 triggerWindow.changeShowState()
         #pygame_gui events
         elif event.type == pygame_gui.UI_BUTTON_PRESSED:
-            if event.ui_element == sideBar.wallBrushButton:
-                editorWindow.setTool("wall")
-            elif event.ui_element == sideBar.barrierBrushButton:
-                editorWindow.setTool("barrier")
+            pass
         elif event.type == pygame_gui.UI_DROP_DOWN_MENU_CHANGED:
             if event.ui_element == sideBar.dropDown:
                 editorWindow.setGridSize(event.text)
+            elif event.ui_element == sideBar.toolDropDown:
+                editorWindow.setTool(event.text)
         elif event.type == pygame_gui.UI_CHECK_BOX_CHECKED:
             if event.ui_element == sideBar.showGridButton:
                 editorWindow.setDisplayGrid(True)

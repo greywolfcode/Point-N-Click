@@ -1,0 +1,28 @@
+{
+    "defaults":
+    {
+        "font":
+        {
+            "name": "ScienceGothic",
+            "size": 24,
+            "regular_path": "assets/fonts/static/ScienceGothic-Regular.ttf"
+        }
+        
+    },
+    "button":
+    {
+        "font":
+        {
+            "name": "ScienceGothic",
+            "size": 24
+        }
+    },
+    "label":
+    {
+        "font":
+        {
+            "name": "ScienceGothic",
+            "size": 24
+        }
+    }
+}
