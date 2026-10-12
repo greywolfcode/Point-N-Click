@@ -144,6 +144,49 @@ class Brush():
             #draw rect
             rectValues = (x, y, width, height)
             pygame.draw.rect(self.surface, (0, 155, 0, 100), rectValues)
+class Stamp():
+    def __init__(self, tag, continuous, xOffset, surface, image):
+        '''        
+        tag: type of element
+        continuous: creates over the range
+        '''
+        self.tag = tag
+        self.continuous = continuous
+        self.xOffset = xOffset
+        self.currentlyDrawing = False
+        self.surface = surface
+        self.image = image
+    def onClick(self):
+        if editorWindow.mouseInWindow():
+            if editorWindow.getSnapToGrid():
+                pos = editorWindow.getClickedCell()
+            else:
+                pos = pygame.mouse.get_pos()
+                pos = pygame.Rect(startPos[0] - self.xOffset, startPos[1], 0, 0) #rect has no width or height
+
+            elementName = self.tag + str(len(mapElements[self.tag]))
+
+            data = {
+                "x": pos.x,
+                "y": pos.y,
+                "width": self.image.width,
+                "height": self.image.height
+            }
+
+            mapElements[self.tag][elementName] = data
+    def onUnclick(self):
+        pass
+    def update(self):
+        if editorWindow.mouseInWindow():
+            pos = editorWindow.getClickedCell()
+            x = pos.x 
+            y = pos.y
+            width = self.image.width 
+            height = self.image.height
+
+            rectValues = (x, y, width, height)
+            self.surface.blit(self.image, rectValues)
+
 #main GUI features
 class SideBar():
     def __init__(self):
