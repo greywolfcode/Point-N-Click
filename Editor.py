@@ -223,13 +223,6 @@ class EditorWindow():
         self.gridType = "m"
         self.doDisplayGrid = True
         self.snapToGrid = True
-        #define brushes
-        self.brushes = {
-            "wall": Brush("wall", True, self.rect.x, self.surface),
-            "barrier": Brush("barrier", True, self.rect.x, self.surface),
-            "portal": Brush("portal", False, self.rect.x, self.surface)
-        }
-        self.currentBrush = self.brushes["wall"]
         #get bg images
         self.bgImages = {
             "wall": pygame.image.load(os.path.join("assets", "images", "bg", "wall_texture.png")),
@@ -239,6 +232,13 @@ class EditorWindow():
         self.elementImages = {
             "portal": pygame.image.load(os.path.join("assets", "images", "interactables", "exit.png"))
         }
+         #define brushes
+        self.brushes = {
+            "wall": Brush("wall", True, self.rect.x, self.surface),
+            "barrier": Brush("barrier", True, self.rect.x, self.surface),
+            "portal": Stamp("portal", False, self.rect.x, self.surface, self.elementImages["portal"])
+        }
+        self.currentBrush = self.brushes["wall"]
         #define largest grid of rects
         self.smallGrid = {}
         for x in range(0, 600, 5):
@@ -281,7 +281,7 @@ class EditorWindow():
                     coords[1] += 600 * self.frame
                     self.surface.blit(self.bgImages[elementType], rect, coords)
                 elif elementType == "portal":
-                    self.surface.blit(self.elementImages[elementType], rect, coords)
+                    self.surface.blit(self.elementImages[elementType], rect)
         if (self.doDisplayGrid):
             self.displayGrid()
             pygame.draw.line(self.surface, (255, 255, 255), (599, 0), (599, 599))
